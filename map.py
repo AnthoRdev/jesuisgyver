@@ -3,16 +3,16 @@ import env
 
 
 class World:
-    AREA = []
+    # AREA = []
     X_MIN = 0
-    X_MAX = env.width
+    X_MAX = env.MAP_WIDTH
     Y_MIN = 0
-    Y_MAX = env.height
+    Y_MAX = env.MAP_HEIGHT
     X_STEP = 1
     Y_STEP = 1
 
     def __init__(self):
-        area = [ i for i in self.X_MAX - self.X_MIN ]
+        area = World._initialize_zones()
 
     def show(self):
         print("Tiles count: ", self.size)
@@ -24,16 +24,15 @@ class World:
     @classmethod
     def _initialize_zones(cls):
         cls.AREA = []
-        for x in range(cls.X_MIN, cls.X_MAX, cls.X.STEP):
+        for x in range(cls.X_MIN, cls.X_MAX, cls.X_STEP):
             for y in range(cls.Y_MIN, cls.Y_MAX, cls.Y_STEP):
-                zone = Zone(bottom_left_corner, top_right_corner)
+                zone = (x, y)
                 cls.AREA.append(zone)
 
 
 def main():
     world = World()
     world.show()
-
 
 
 if __name__ == "__main__":
