@@ -1,0 +1,18 @@
+{
+  "GAME_NAME": "Je Suis Gyver",
+  "MAP":
+  {
+    "FILE": "./ressources/mapfile.txt"
+  },
+  "PLAYER":
+  {
+    "NAME": "Gyver"
+  },
+  "ITEMS":
+  {
+    "N": "Needle",
+    "T": "Tub",
+    "E": "Ether",
+    "J": "Toy"
+  }
+}
