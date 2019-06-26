@@ -1,0 +1,14 @@
+[[source]]
+name = "jesuisgyver"
+url = "https://anthor.me/jesuisgyver"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+pylint = "*"
+
+[packages]
+env = "*"
+
+[requires]
+python_version = "3.7"
