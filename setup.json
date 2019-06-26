@@ -2,12 +2,7 @@
   "GAME_NAME": "Je Suis Gyver",
   "MAP":
   {
-    "X_MIN": 10,
-    "X_MAX": 25,
-    "Y_MIN": 10,
-    "Y_MAX": 25,
-    "X_STEP": 1,
-    "Y_STEP": 1
+    "FILE": "./ressources/mapfile.txt"
   },
   "PLAYER":
   {
@@ -17,6 +12,7 @@
   {
     "N": "Needle",
     "T": "Tub",
-    "E": "Ether"
+    "E": "Ether",
+    "J": "Toy"
   }
 }
