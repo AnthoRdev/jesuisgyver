@@ -3,7 +3,7 @@ import classes.display as disp
 
 class Gameplay:
 
-    def __init__(self, my_config, world, player):
+    def __init__(self, my_config, world, player, playing):
         self.position = world.start_position
         self.start_position = world.start_position
         self.end_position = world.end_position
@@ -11,6 +11,7 @@ class Gameplay:
         self.items = my_config['ITEMS']
         self.world = world
         self.display = disp.Display()
+        self.playing = playing
 
     def choose_action(self, player, game_input=None):
         """listen the terminal to choose wich action to make"""
@@ -30,7 +31,7 @@ class Gameplay:
         elif game_input == "q":
             serious = input(self.display.are_u_sure())
             if serious == "yes":
-                self._after_death(player)
+                self.playing = self._after_death(player)
             else:
                 self.choose_action(player)
         else:
@@ -102,8 +103,8 @@ class Gameplay:
             player.position = self.start_position
             self.choose_action(player)
         elif try_again == "n":
-            self.display
-            exit()
+            # self.display.
+            return 0
         else:
             self.display.shutdown()
-            exit()
+            return 0

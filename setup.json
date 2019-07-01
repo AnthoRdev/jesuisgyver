@@ -1,18 +1,47 @@
 {
-  "GAME_NAME": "Je Suis Gyver",
+  "TITLE": "Je Suis Gyver",
+  "ICON": "./images/icon.png",
   "MAP":
   {
-    "FILE": "./ressources/mapfile.txt"
+    "X_TILES": 15,
+    "Y_TILES": 15,
+    "TILE_WIDTH": 20,
+    "TILE_HEIGHT": 20,
+    "FILE": "./ressources/mapfile.txt",
+    "WALL": "./images/wall.png",
+    "PATH": "./images/path.png",
+    "GUARD":  "./images/guard.png"
   },
   "PLAYER":
   {
-    "NAME": "Gyver"
+    "NAME": "Gyver",
+    "IMAGE": "./images/gyver.png"
   },
   "ITEMS":
   {
-    "N": "Needle",
-    "T": "Tub",
-    "E": "Ether",
-    "J": "Toy"
+    "N":
+    {
+      "NAME": "Needle",
+      "IMAGE": "./images/needle.png",
+      "REQUIRED": "True"
+    },
+    "T":
+    {
+      "NAME": "Tub",
+      "IMAGE": "./images/tub.png",
+      "REQUIRED": "True"
+    },
+    "E":
+    {
+      "NAME": "Ether",
+      "IMAGE": "./images/ether.png",
+      "REQUIRED": "True"
+    },
+    "J":
+    {
+      "NAME": "Toy",
+      "IMAGE": "./images/toy.png",
+      "REQUIRED": "False"
+    }
   }
 }
