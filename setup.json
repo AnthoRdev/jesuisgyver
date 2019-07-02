@@ -7,7 +7,7 @@
     "Y_TILES": 15,
     "TILE_WIDTH": 20,
     "TILE_HEIGHT": 20,
-    "FILE": "./ressources/mapfile.txt",
+    "FILE": "./mapfile.txt",
     "WALL": "./images/wall.png",
     "PATH": "./images/path.png",
     "GUARD":  "./images/guard.png"

@@ -16,6 +16,6 @@ class Player:
 
     def get_item(self, item):
         """add founded item in player bag"""
-        item_name = self.items[item]
+        item_name = self.items[item]['NAME']
         self.bag.add(item_name)
         print(f"You found that: {item_name}.")

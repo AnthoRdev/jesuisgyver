@@ -4,23 +4,8 @@ from random import *
 class World:
 
     def __init__(self, my_config):
-        self.ITEMS = list(my_config['ITEMS'])
+        self.ITEMS = dict(my_config['ITEMS'])
         self.worldmap = World._create_map(self, my_config['MAP']['FILE'])
-
-    def __str__(self):
-        return (f"{'=' * 80}\n"
-                f"Map: {self.worldmap}\n"
-                f"Tiles count: {self.size}\n"
-                f"Start to End: {self.start_position} ===> {self.end_position}\n"
-                f"Needle => {self.needle_position} // "
-                f"Tub => {self.tub_position} // "
-                f"Ether => {self.ether_position} // "
-                f"Toy => {self.toy_position}\n"
-                f"{'=' * 80}")
-
-    @property
-    def size(self):
-        return len(self.worldmap)
 
     def _create_map(self, mapfile):
         worldmap = {}
@@ -34,7 +19,7 @@ class World:
                 for x, tile in enumerate(line):
                     worldmap[(x, y)] = tile
         # Add items on map in random positions
-        worldmap = World._randomize_items_positions(self, worldmap)
+        worldmap = self._randomize_items_positions(worldmap)
         return worldmap
 
     def _randomize_items_positions(self, worldmap):
@@ -73,3 +58,8 @@ class World:
         self.worldmap.remove(old_position)
         new_position = tuple([next_tile[0][0], "."])
         self.worldmap.add(new_position)
+
+    @staticmethod
+    def coor_convert(x, y):
+        (x, y) = x * 20, 280 - (y * 20)
+        return x, y
