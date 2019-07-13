@@ -1,4 +1,4 @@
-# Mc LetsGuy
+# Je suis Gyver
 **Projet 3 de la formation OpenClassrooms DA Python**
 
 Réalisation du jeu qui va changer votre relation avec le video gaming. Comme pas mal de bonne chose, n'en abusez pas, mais amusez vous.
