@@ -1,0 +1,48 @@
+{
+  "TITLE": "Je Suis Gyver",
+  "ICON": "./images/icon.png",
+  "MAP":
+  {
+    "X_TILES": 15,
+    "Y_TILES": 15,
+    "TILE_WIDTH": 30,
+    "TILE_HEIGHT": 30,
+    "MARGIN": 10,
+    "FILE": "./settings/mapfile.txt",
+    "WALL": "./images/wall.png",
+    "PATH": "./images/path.png",
+    "GUARD":  "./images/guard.png"
+  },
+  "PLAYER":
+  {
+    "NAME": "Gyver",
+    "IMAGE": "./images/gyver.png"
+  },
+  "ITEMS":
+  {
+    "N":
+    {
+      "NAME": "Needle",
+      "IMAGE": "./images/needle.png",
+      "REQUIRED": 1
+    },
+    "T":
+    {
+      "NAME": "Tub",
+      "IMAGE": "./images/tube.png",
+      "REQUIRED": 1
+    },
+    "E":
+    {
+      "NAME": "Ether",
+      "IMAGE": "./images/ether.png",
+      "REQUIRED": 1
+    },
+    "J":
+    {
+      "NAME": "Toy",
+      "IMAGE": "./images/toy.png",
+      "REQUIRED": 0
+    }
+  }
+}
