@@ -2,9 +2,11 @@ import components.gameplay as gp
 
 
 def main():
+    gaming = 1
+    while gaming:
+        game = gp.Gameplay()
+        gaming = game.start_loop()
 
-    game = gp.Gameplay()
-    game.game_loop()
 
 if __name__ == "__main__":
     main()

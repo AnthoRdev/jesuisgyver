@@ -1,14 +1,10 @@
 class Player:
 
-    def __init__(self, my_config):
+    def __init__(self, game_config):
         self.position = ()
-        self.items = my_config['ITEMS']
         self.bag = set()
-
-    def __str__(self):
-        # TODO Faut-il passer ca dans la classe display? je pense que oui.
-        # TODO Ameliorer l'affichage de self.bag.
-        return f"You are there: {self.position}, and that's in your bag: {self.bag}"
+        self.items = game_config['ITEMS']  # Get the dict of items
+        self.name = game_config['PLAYER']['NAME']
 
     def move_on(self, next_position):
         """change the actual position of the player"""
@@ -18,4 +14,4 @@ class Player:
         """add founded item in player bag"""
         item_name = self.items[item]['NAME']
         self.bag.add(item_name)
-        print(f"You found that: {item_name}.")
+        return item_name

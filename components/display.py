@@ -1,53 +1,96 @@
+import pygame
+import components.message as mess
+
+
 class Display:
-    def __init__(self):
-        pass
+    def __init__(self, game_config):
+        # Initialize references Pygame
+        self.game_title = game_config["TITLE"]
+        self.image_icon = game_config["ICON"]
+        self.window_width = game_config["MAP"]["X_TILES"] * game_config["MAP"]["TILE_WIDTH"] + 20
+        self.window_height = game_config["MAP"]["Y_TILES"] * game_config["MAP"]["TILE_HEIGHT"] + 80
+        self.image_wall = game_config["MAP"]["WALL"]
+        self.image_path = game_config["MAP"]["PATH"]
+        self.image_player = game_config["PLAYER"]["IMAGE"]
+        self.image_guard = game_config["MAP"]["GUARD"]
+        self.image_needle = game_config["ITEMS"]["N"]["IMAGE"]
+        self.image_tub = game_config["ITEMS"]["T"]["IMAGE"]
+        self.image_ether = game_config["ITEMS"]["E"]["IMAGE"]
+        self.image_toy = game_config["ITEMS"]["J"]["IMAGE"]
 
-    def where_we_going(self):
-        return "Where do you wants to go? (directions:w,a,s,z or quit with 'q')"
+        # Set the game title displayed on window
+        pygame.display.set_caption(self.game_title)
 
-    def out_of_range(self):
-        print("Out of range. A day I hope you will find the right hole, buddy.")
+        # Set the game icon
+        self.icon = pygame.image.load(self.image_icon)
+        pygame.display.set_icon(self.icon)
 
-    def back_to_start(self):
-        print("No, idiot, you can't escape from there by this way. Ah ah ah!!!")
+        # Define the window for the game
+        self.window = pygame.display.set_mode((self.window_width, self.window_height))
+        self.ground_color = (82, 66, 39)
+        self.window.fill(self.ground_color)
 
-    def what_in_bag(self, player):
-        print("You got", player.bag)
+        # Load visuals elements and set initial place
+        self.image_path = pygame.image.load(self.image_path).convert()
+        self.image_wall = pygame.image.load(self.image_wall).convert()
+        self.image_guard = pygame.image.load(self.image_guard).convert_alpha()
+        self.image_needle = pygame.image.load(self.image_needle).convert_alpha()
+        self.image_tub = pygame.image.load(self.image_tub).convert_alpha()
+        self.image_ether = pygame.image.load(self.image_ether).convert_alpha()
+        self.image_toy = pygame.image.load(self.image_toy).convert_alpha()
+        self.image_player = pygame.image.load(self.image_player).convert_alpha()
 
-    def missing_items(self):
-        print("You're not enough prepared to affront Chuck.\nFind some "
-              "good items or good ideas, but find something. For now, "
-              "you're dead.\nGAME OVER")
+    def start_screen(self):
+        button_color = (102, 155, 65)
+        self.window.fill(self.ground_color)
+        start_button = pygame.draw.rect(self.window, button_color, (100, 150, 270, 150))
+        self.display_message("START", [165, 205], "button")
+        pygame.display.update()
+        return start_button
 
-    def hit_wall(self):
-        print("Stop trying to imitate a ghost, change direction "
-              "or call Chuck Norris")
+    def map_screen(self, world, player, message):
+        """Defines where and what's have to be displayed on screen"""
+        self.window.fill(self.ground_color)
+        for position in world.worldmap:
+            if position[1] != "#":
+                image_tile = self.image_path
+                if position[1] == "O":
+                    image_tile = self.image_guard
+                elif position[1] == "N":
+                    image_tile = self.image_needle
+                elif position[1] == "T":
+                    image_tile = self.image_tub
+                elif position[1] == "E":
+                    image_tile = self.image_ether
+                elif position[1] == "J":
+                    image_tile = self.image_toy
+            else:
+                image_tile = self.image_wall
+            x, y = position[0]  # unpack coordonates
+            self.window.blit(image_tile, world.coor_convert(x, y))  # Affect tile image to the converted position
+        x, y = player.position
+        self.window.blit(self.image_player, world.coor_convert(x, y))
+        self.display_message(message, [20, 480], "info")  # First line displayed on screen
+        self.display_message(mess.Message.whats_in_bag(player), [20, 500], "info")  # Second line displayed on screen
+        pygame.display.update()  # Refresh the screen
 
-    def you_win(self):
-        print("After discovering that the guard was Chuck Norris. You decide to "
-              "prepare with all of your items, an ether based sedative for "
-              "horses. You injected that potion in his neck. "
-              "Congratulation Mac, you beaten Chuck, enjoy the freedom!")
+    def end_screen(self):
+        retry_button_color = (200, 131, 47)
+        retry_button = pygame.draw.rect(self.window, retry_button_color, (35, 150, 170, 70))
+        quit_button_color = (138, 9, 0)
+        quit_button = pygame.draw.rect(self.window, quit_button_color, (265, 150, 170, 70))
+        self.display_message("RETRY", [52, 167], "button")
+        self.display_message("QUIT", [300, 167], "button")
+        pygame.display.update()
+        return retry_button, quit_button
 
-    def you_loose(self):
-        print()
-
-    def ask_retry(self):
-        return "Try again? (y/n)"
-
-    def not_retry(self):
-        print("Don't be afraid anymore, come back now!")
-
-    def retry(self):
-        print("Yeah! I know this game is definitly amazing!")
-        print("=" * 80)
-
-    def are_u_sure(self):
-        return "Are you sure? type 'yes' if yes"
-
-    def kidding_me(self):
-        return "Are you kidding me? Dare repeat!"
-
-    def shutdown(self):
-        print("You definitly have no chances to win. "
-              "To shutdown, try to unplug your laptop...")
+    def display_message(self, message, pos, type):
+        """Defines where is displayed and how the message look like"""
+        if type == "button":
+            text_font = pygame.font.Font("fonts/Mario-Kart-DS.ttf", 40)
+            font_color = (0, 0, 0)
+        else:
+            text_font = pygame.font.Font("fonts/RetroGaming.ttf", 13)
+            font_color = (255, 255, 255)
+        message_text_surface = text_font.render(message, True, font_color)
+        self.window.blit(message_text_surface, pos)

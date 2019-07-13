@@ -5,9 +5,10 @@
   {
     "X_TILES": 15,
     "Y_TILES": 15,
-    "TILE_WIDTH": 20,
-    "TILE_HEIGHT": 20,
-    "FILE": "./mapfile.txt",
+    "TILE_WIDTH": 30,
+    "TILE_HEIGHT": 30,
+    "MARGIN": 10,
+    "FILE": "./settings/mapfile.txt",
     "WALL": "./images/wall.png",
     "PATH": "./images/path.png",
     "GUARD":  "./images/guard.png"
@@ -23,25 +24,25 @@
     {
       "NAME": "Needle",
       "IMAGE": "./images/needle.png",
-      "REQUIRED": "True"
+      "REQUIRED": 1
     },
     "T":
     {
       "NAME": "Tub",
-      "IMAGE": "./images/tub.png",
-      "REQUIRED": "True"
+      "IMAGE": "./images/tube.png",
+      "REQUIRED": 1
     },
     "E":
     {
       "NAME": "Ether",
       "IMAGE": "./images/ether.png",
-      "REQUIRED": "True"
+      "REQUIRED": 1
     },
     "J":
     {
       "NAME": "Toy",
       "IMAGE": "./images/toy.png",
-      "REQUIRED": "False"
+      "REQUIRED": 0
     }
   }
 }

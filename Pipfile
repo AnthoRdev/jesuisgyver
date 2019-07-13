@@ -7,8 +7,6 @@ verify_ssl = true
 
 [packages]
 pygame = "*"
-venvdotapp = "*"
-scrapy = "*"
 
 [requires]
 python_version = "3.7"

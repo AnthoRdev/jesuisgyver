@@ -2,216 +2,139 @@ import json
 import pygame
 from pygame.locals import *
 
-
-import components.map as map
+import components.world as world
 import components.player as player
+import components.message as mess
 import components.display as disp
 
 
 class Gameplay:
 
     def __init__(self):
+        # Initialize Pygame library
+        pygame.init()
         # Load the configuration
-        with open('setup.json', encoding='utf8') as game_config:
-            my_config = json.load(game_config)
-            # assert type(my_config) is dict  # convertir en dictionnaire? vu sur developpez.net
-        # Initialize the world map
-        self.world = map.World(my_config)
-        print(self.world)  # statistic and details of the world map
-        # Give birth to McGyver
-        self.gyver = player.Player(my_config)
+        with open('settings/setup.json', encoding='utf8') as setup_file:
+            self.game_config = json.load(setup_file)
 
-        self.position = self.world.start_position
+        self.world = world.World(self.game_config)  # Initialize the world map
+        self.player = player.Player(self.game_config)  # Give birth to McGyver
+        self.window = disp.Display(self.game_config)  # Initialize the display
         self.start_position = self.world.start_position
         self.end_position = self.world.end_position
-        self.gyver.position = self.start_position
-        self.items = my_config['ITEMS']
-        self.world = self.world
-        self.display = disp.Display()
+        self.player.position = self.world.start_position
+        self.items = self.game_config['ITEMS']
+        self.clock = pygame.time.Clock()
 
-        # Initialize references Pygame
-        self.game_title = my_config["TITLE"]
-        self.image_icon = my_config["ICON"]
-        self.window_width = my_config["MAP"]["X_TILES"] * my_config["MAP"]["TILE_WIDTH"]
-        self.window_height = my_config["MAP"]["Y_TILES"] * my_config["MAP"]["TILE_HEIGHT"]
-        self.image_wall = my_config["MAP"]["WALL"]
-        self.image_path = my_config["MAP"]["PATH"]
-        self.gyver_image = my_config["PLAYER"]["IMAGE"]
-        self.image_guard = my_config["MAP"]["GUARD"]
-        self.image_needle = my_config["ITEMS"]["N"]["IMAGE"]
-        self.image_tub = my_config["ITEMS"]["T"]["IMAGE"]
-        self.image_ether = my_config["ITEMS"]["E"]["IMAGE"]
-        self.image_toy = my_config["ITEMS"]["E"]["IMAGE"]  # TODO Ajouter une image de canard
-
-        # Initialize Pygame
-        pygame.init()
-
-        # Set the game title displayed on window
-        pygame.display.set_caption(self.game_title)
-
-        # Set the game icon
-        self.icon = pygame.image.load(self.image_icon)
-        pygame.display.set_icon(self.icon)
-
-        # Define the window for the game
-        self.window = pygame.display.set_mode((self.window_width, self.window_height))
-
-        # Load visuals elements and set initial place
-        self.image_path = pygame.image.load(self.image_path).convert()
-        self.image_wall = pygame.image.load(self.image_wall).convert()
-        self.image_guard = pygame.image.load(self.image_guard).convert()
-        self.image_needle = pygame.image.load(self.image_needle).convert()
-        self.image_tub = pygame.image.load(self.image_tub).convert()
-        self.image_tub.set_colorkey((255, 255, 255))
-        self.image_ether = pygame.image.load(self.image_ether).convert()
-        self.image_ether.set_colorkey((255, 255, 255))
-        self.image_toy = pygame.image.load(self.image_toy).convert()
-
-        self.pion_gyver = pygame.image.load(self.gyver_image).convert()
-
-        for position in self.world.worldmap:
-            if position[1] != "#":
-                image_tile = self.image_path
-                if position[1] == "O":
-                    image_tile = self.image_guard
-                elif position[1] == "N":
-                    image_tile = self.image_needle
-                elif position[1] == "T":
-                    image_tile = self.image_tub
-                elif position[1] == "E":
-                    image_tile = self.image_ether
-                elif position[1] == "J":
-                    image_tile = self.image_toy
-            else:
-                image_tile = self.image_wall
-            x, y = position[0]
-            self.window.blit(image_tile, self.world.coor_convert(x, y))
-        x, y = self.gyver.position
-        self.window.blit(self.pion_gyver, self.world.coor_convert(x, y))
-        pygame.display.update()
+    def start_loop(self):
+        """Wait player clicking Start to begin the game"""
+        starting = 1
+        while starting:
+            self.clock.tick(15)
+            start_button = self.window.start_screen()
+            for event in pygame.event.get():
+                pos = pygame.mouse.get_pos()  # Get mouse position
+                pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()  # Get button clicked
+                # Check if the click was in the button OR the return key is pressed
+                if (start_button.collidepoint(pos) and pressed1) or\
+                        (event.type == KEYDOWN and event.key == K_RETURN):
+                    return self.game_loop()
+                elif event.type == pygame.QUIT:
+                    gaming = 0  # Explicit is better
+                    return gaming  # this define what returned in main()
 
     def game_loop(self):
-        # Start the game
+        """Start the game and loop until you quit, loose or win!"""
         playing = 1
-        clock = pygame.time.Clock()
+        message = mess.Message.welcome(self.player)
         while playing:
-            clock.tick(15)
+            self.window.map_screen(self.world, self.player, message)
+            self.clock.tick(15)
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
-                    x_old, y_old = self.gyver.position
                     if event.key == K_ESCAPE:
-                        playing = self.choose_action(self.gyver, 'q')
-                    if event.key == K_UP:
-                        playing = self.choose_action(self.gyver, 'w')
-                    if event.key == K_RIGHT:
-                        playing = self.choose_action(self.gyver, 's')
-                    if event.key == K_DOWN:
-                        playing = self.choose_action(self.gyver, 'z')
-                    if event.key == K_LEFT:
-                        playing = self.choose_action(self.gyver, 'a')
+                        playing = 0
+                    elif event.key == K_UP:
+                        playing, message = self._next_action(self.player, (0, -1))
+                    elif event.key == K_RIGHT:
+                        playing, message = self._next_action(self.player, (1, 0))
+                    elif event.key == K_DOWN:
+                        playing, message = self._next_action(self.player, (0, 1))
+                    elif event.key == K_LEFT:
+                        playing, message = self._next_action(self.player, (-1, 0))
+                self.window.map_screen(self.world, self.player, message)  # Update the screen
+                if playing == 0:
+                    return self.end_loop()
+                elif event.type == pygame.QUIT:
+                    gaming = 0  # Explicit is better
+                    return gaming  # this define what returned in main()
 
-                    self.window.blit(self.image_path, self.world.coor_convert(x_old, y_old))
-                    x, y = self.gyver.position
-                    self.window.blit(self.pion_gyver, self.world.coor_convert(x, y))
-                    pygame.display.update()
+    def end_loop(self):
+        """Ending screen offer you two options to retry or quit game."""
+        ending = 1
+        while ending:
+            self.clock.tick(15)
+            retry_button, quit_button = self.window.end_screen()
+            for event in pygame.event.get():
+                pos = pygame.mouse.get_pos()  # Get mouse position
+                pressed1, pressed2, pressed3 = pygame.mouse.get_pressed()  # Get button clicked
+                # Check if the click was in the button OR the return key is pressed
+                if retry_button.collidepoint(pos) and pressed1:
+                    gaming = 1  # Explicit is better
+                    return gaming  # this define what returned in main()
+                elif quit_button.collidepoint(pos) and pressed1:
+                    return 0
+                elif event.type == pygame.QUIT:
+                    return 0
 
-    def choose_action(self, player, game_input=None):
-        """listen the terminal to choose wich action to make"""
-        print(player)
-
-        if game_input is None:
-            game_input = input(self.display.where_we_going())
-
-        if game_input == "w":
-            return self._move_up(player)
-        elif game_input == "a":
-            return self._move_left(player)
-        elif game_input == "s":
-            return self._move_right(player)
-        elif game_input == "z":
-            return self._move_down(player)
-        elif game_input == "q":
-            # serious = input(self.display.are_u_sure())
-            # if serious == "yes":
-            #     return self._after_death(player)
-            # else:
-            #     return self.choose_action(player)
-            return 0
-        else:
-            print(self.display.kidding_me())
-            self.choose_action(player)
-
-    def _move_up(self, player):
+    def _next_action(self, player, movement):
+        """Defines the next position of the player"""
+        move_x, move_y = movement
         x, y = player.position
-        next_position = x, y + 1
-        return self._define_action(player, next_position)
-
-    def _move_down(self, player):
-        x, y = player.position
-        next_position = x, y - 1
-        return self._define_action(player, next_position)
-
-    def _move_left(self, player):
-        x, y = player.position
-        next_position = x - 1, y
-        return self._define_action(player, next_position)
-
-    def _move_right(self, player):
-        x, y = player.position
-        next_position = x + 1, y
+        next_position = x + move_x, y + move_y
         return self._define_action(player, next_position)
 
     def _define_action(self, player, next_position):
         """Check the next position to define the action will be executed"""
-        tile = set((next_position, tile) for (coor, tile) in self.world.worldmap if coor == next_position)
-        # test d'appartenance pour verifier s'il fait parti du set, recupere la tuile et
-        # converti en liste (pour pouvoir utiliser [0], impossible dans un set)
-        next_tile = list(tile & self.world.worldmap)  # TODO voir s'il est possible de rester en set
-        if not next_tile:  # equal next_tile == []
-            self.display.out_of_range()
-            return self._after_death(player)
+        tile = set((next_position, tile)
+                   for (coor, tile)
+                   in self.world.worldmap
+                   if coor == next_position)
+        next_tile = list(tile & self.world.worldmap)
+        if not next_tile:  # equal next_tile == []. That check if player is moving inside range of map
+            action = 0, mess.Message.out_of_range()
+            return action
         elif next_tile[0][0] == self.start_position:
-            self.display.back_to_start()
+            action = 1, mess.Message.back_to_start()
             player.move_on(next_tile[0][0])
-            # self.choose_action(player)
-            return 1
+            return action
         elif next_tile[0][0] == self.end_position:
-            self.display.what_in_bag(player)
             player.move_on(next_tile[0][0])
-            if {'Needle', 'Tub', 'Ether'} <= player.bag:  # TODO creer liste d'objets requis
-                return self._is_winner(player)
+            if self.required_items() <= player.bag:
+                action = 0, mess.Message.you_win()
+                return action
             else:
-                self.display.missing_items()
-                return self._after_death(player)
+                action = 0, mess.Message.missing_items()
+                return action
         elif next_tile[0][1] == '#':
-            self.display.hit_wall()
-            # self.choose_action(player)
-            return 1
+            action = 1, mess.Message.hit_wall()
+            return action
         elif next_tile[0][1] in self.items:
             player.move_on(next_tile[0][0])
-            player.get_item(next_tile[0][1])
+            item = player.get_item(next_tile[0][1])
             self.world.change_tile(next_tile)
-            # self.choose_action(player)
-            return 1
+            action = 1, mess.Message.you_found(item)
+            return action
         else:
             player.move_on(next_tile[0][0])
-            # self.choose_action(player)
-            return 1
+            return 1, ""
 
-    def _is_winner(self, player):
-        self.display.you_win()
-        return self._after_death(player)
-
-    def _after_death(self, player):
-        try_again = input(self.display.ask_retry())
-        if try_again == "y":
-            self.display.retry()
-            player.bag.clear()  # TODO Ne pas oublier de replacer les objets !!
-            player.position = self.start_position
-            # self.choose_action(player)
-            return 1
-        elif try_again == "n":
-            return 0
-        else:
-            self.display.shutdown()
-            return 0
+    def required_items(self):
+        """Create a set of required items required if you want to win."""
+        required_items = set()
+        for item in self.items.items():
+            code, spec = item
+            if spec['REQUIRED']:
+                print('Req:', spec['NAME'])
+                required_items.add(spec['NAME'])
+        return required_items
